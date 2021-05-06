@@ -112,7 +112,7 @@ func BenchmarkStringToTrigram(b *testing.B) {
 	}
 }
 
-func BenchmarkStringToTrigram_long(b *testing.B) {
+func BenchmarkStringToTrigramLarge(b *testing.B) {
 	// Fetch 'main.go' file as a string
 	file := openFileAsString("main.go")
 
@@ -165,7 +165,7 @@ func BenchmarkAdd(b *testing.B) {
 	}
 }
 
-func BenchmarkAdd_long(b *testing.B) {
+func BenchmarkAddLarge(b *testing.B) {
 	ni := NewNgramIndex()
 
 	// Fetch 'main.go' file as a string
