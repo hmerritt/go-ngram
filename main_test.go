@@ -58,6 +58,12 @@ func TestNewNgramIndex(t *testing.T) {
 }
 
 func TestStringToNgram(t *testing.T) {
+	// Test empty ngram
+	gram5 := StringToNgram("nope", 5)
+	if len(gram5) > 0 { // to
+		t.Errorf("ngam did the impossible and returned somthing, expect empty slice'\n")
+	}
+
 	// Test di-gram, 2 chars
 	gram2 := StringToNgram("to", 2)
 	gram2Many := StringToNgram("two chars", 2)
@@ -136,14 +142,6 @@ func TestAdd(t *testing.T) {
 		t.Errorf("NgramMap trigram does not match string added. Expected TXkg'\n")
 	}
 
-	if !ngramMapKeyExists(ni, "c3Qg") { // 'st '
-		t.Errorf("NgramMap trigram does not match string added. Expected c3Qg'\n")
-	}
-
-	if !ngramMapKeyExists(ni, "aXJl") { // 'ire'
-		t.Errorf("NgramMap trigram does not match string added. Expected aXJl'\n")
-	}
-
 	if !ngramMapKeyExists(ni, "dG9v") { // 'too'
 		t.Errorf("NgramMap trigram does not match string added. Expected dG9v'\n")
 	}
@@ -151,10 +149,6 @@ func TestAdd(t *testing.T) {
 	// Check if n-gram index values match up
 	if !ngramMapValueExists(ni, "TXkg", 0) { // 'My '
 		t.Errorf("NgramMap index value not found. Expected 0'\n")
-	}
-
-	if !ngramMapValueExists(ni, "dG9v", 2) { // 'too'
-		t.Errorf("NgramMap index value not found. Expected 2'\n")
 	}
 
 	if !(ngramMapValueExists(ni, "aXRl", 0) && ngramMapValueExists(ni, "aXRl", 1) && ngramMapValueExists(ni, "aXRl", 2)) { // 'ite'
