@@ -65,24 +65,60 @@ func StringToNgram(s string, ngram int) []string {
  * ngram - this means the index value is accessible
  * through any part of the original string
  */
-func (t *NgramIndex) Add(str string, index int) {
+func (n *NgramIndex) Add(str string, index int) {
 	// Add index to main map
 	// index *should* always be unique
-	t.IndexesMap[index] = struct{}{}
+	n.IndexesMap[index] = struct{}{}
 
 	// Get ngram slice from input string
-	ngram := StringToNgram(str, t.Ngram)
+	ngram := StringToNgram(str, n.Ngram)
 
 	// Add each ngram into store
 	for _, ng := range ngram {
 		// Check if ng does NOT exist
-		if _, exist := t.NgramMap[ng]; !exist {
+		if _, exist := n.NgramMap[ng]; !exist {
 			// Create ng
 			newNg := make(map[int]struct{})
-			t.NgramMap[ng] = newNg
+			n.NgramMap[ng] = newNg
 		}
 
 		// Add index value to ng
-		t.NgramMap[ng][index] = struct{}{}
+		n.NgramMap[ng][index] = struct{}{}
 	}
+}
+
+/*
+ * Search the NgramMap and return
+ * an array of all the stored index values
+ * that matched the input string
+ */
+func (n *NgramIndex) GetMatches(str string) map[int]int {
+	// Create map of indexes plus how often
+	// each one matched. This is used to detirmine
+	// an indexes 'weight'.
+	matches := make(map[int]int)
+
+	// Get ngram slice
+	ngram := StringToNgram(str, n.Ngram)
+
+	// Loop each ngram looking for matches
+	for _, tg := range ngram {
+		// Check if tg exists
+		if _, exist := n.NgramMap[tg]; exist {
+			// MATCH!
+
+			// Add all indexes to matched
+			for index := range n.NgramMap[tg] {
+				// Has index been added already,
+				// increment match weight
+				if _, exist := matches[index]; exist {
+					matches[index] = matches[index] + 1
+				} else {
+					matches[index] = 1
+				}
+			}
+		}
+	}
+
+	return matches
 }
