@@ -215,3 +215,17 @@ func TestGetMatches(t *testing.T) {
 		t.Errorf("Match for 'count first item' failed. Expected 9 matches for first item\n")
 	}
 }
+
+func BenchmarkGetMatches(b *testing.B) {
+	ni := NewNgramIndex()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ni.Add("1234567890", 0) // change 0 -> i for a real bench (takes a while)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ni.GetMatches("1234567890")
+	}
+}
