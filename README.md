@@ -1,4 +1,6 @@
-# N-gram Index and Search
+# n-gram Index and Search
+[![Go](https://github.com/hmerritt/go-ngram/actions/workflows/go.yml/badge.svg)](https://github.com/hmerritt/go-ngram/actions/workflows/go.yml)
+
 Create n-grams, index items, and search through them.
 
 
