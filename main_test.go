@@ -5,6 +5,41 @@ import (
 	"testing"
 )
 
+/*
+ * Test helper functions
+ */
+
+func openFile(p string) []byte {
+	data, err := os.ReadFile(p)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+func openFileAsString(p string) string {
+	data := openFile(p)
+	return string(data)
+}
+
+func ngramMapKeyExists(m *NgramIndex, s string) bool {
+	if _, ok := m.NgramMap[s]; ok {
+		return true
+	}
+	return false
+}
+
+func ngramMapValueExists(m *NgramIndex, s string, i int) bool {
+	if _, ok := m.NgramMap[s][i]; ok {
+		return true
+	}
+	return false
+}
+
+/*
+ * Tests + Benchmarks
+ */
+
 func TestNewNgramIndex(t *testing.T) {
 	ni := NewNgramIndex()
 
@@ -74,15 +109,47 @@ func BenchmarkStringToTrigram_long(b *testing.B) {
 	}
 }
 
-func openFile(p string) []byte {
-	data, err := os.ReadFile(p)
-	if err != nil {
-		panic(err)
-	}
-	return data
-}
+func TestAdd(t *testing.T) {
+	// Create new index
+	ni := NewNgramIndex()
 
-func openFileAsString(p string) string {
-	data := openFile(p)
-	return string(data)
+	// Add a few items
+	ni.Add("My first index item", 0)
+	ni.Add("Second item", 1)
+	ni.Add("Thired item too", 2)
+
+	// Check the index got added
+	if ni.IndexesMap[0] != struct{}{} || ni.IndexesMap[1] != struct{}{} || ni.IndexesMap[2] != struct{}{} {
+		t.Errorf("IndexMap does not match items added'\n")
+	}
+
+	// Check if ngrams added correctly
+	if !ngramMapKeyExists(ni, "TXkg") { // 'My '
+		t.Errorf("NgramMap trigram does not match string added. Expected TXkg'\n")
+	}
+
+	if !ngramMapKeyExists(ni, "c3Qg") { // 'st '
+		t.Errorf("NgramMap trigram does not match string added. Expected c3Qg'\n")
+	}
+
+	if !ngramMapKeyExists(ni, "aXJl") { // 'ire'
+		t.Errorf("NgramMap trigram does not match string added. Expected aXJl'\n")
+	}
+
+	if !ngramMapKeyExists(ni, "dG9v") { // 'too'
+		t.Errorf("NgramMap trigram does not match string added. Expected dG9v'\n")
+	}
+
+	// Check if n-gram index values match up
+	if !ngramMapValueExists(ni, "TXkg", 0) { // 'My '
+		t.Errorf("NgramMap index value not found. Expected 0'\n")
+	}
+
+	if !ngramMapValueExists(ni, "dG9v", 2) { // 'too'
+		t.Errorf("NgramMap index value not found. Expected 2'\n")
+	}
+
+	if !(ngramMapValueExists(ni, "aXRl", 0) && ngramMapValueExists(ni, "aXRl", 1) && ngramMapValueExists(ni, "aXRl", 2)) { // 'ite'
+		t.Errorf("NgramMap index value not found. Expected 0, 1 and 2'\n")
+	}
 }
