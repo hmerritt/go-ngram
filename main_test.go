@@ -22,6 +22,13 @@ func openFileAsString(p string) string {
 	return string(data)
 }
 
+func mapIntIntExists(m map[int]int, i int) bool {
+	if _, ok := m[i]; ok {
+		return true
+	}
+	return false
+}
+
 func ngramMapKeyExists(m *NgramIndex, s string) bool {
 	if _, ok := m.NgramMap[s]; ok {
 		return true
@@ -173,5 +180,38 @@ func BenchmarkAdd_long(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		// Ngram of an entire file 'main.go'
 		ni.Add(file, i)
+	}
+}
+
+func TestGetMatches(t *testing.T) {
+	// Create new index
+	ni := NewNgramIndex()
+
+	// Add a few items
+	ni.Add("My first index item", 0)
+	ni.Add("Second item", 1)
+	ni.Add("Thired item too", 2)
+	ni.Add("Fourth item woowop", 3)
+
+	// Get search results
+	res1 := ni.GetMatches("first")
+	res2 := ni.GetMatches("Second")
+	res3 := ni.GetMatches("all items")
+	res4 := ni.GetMatches("count first item")
+
+	if !mapIntIntExists(res1, 0) || res1[0] != 3 { // 'first' matches 3 times when using a trigram
+		t.Errorf("Match count for 'first' is wrong. Expected 3'\n")
+	}
+
+	if !mapIntIntExists(res2, 1) || res2[1] != 4 { // 'Second' matches 4 times when using a trigram
+		t.Errorf("Match count for 'Second' is wrong. Expected 4'\n")
+	}
+
+	if !mapIntIntExists(res3, 0) || !mapIntIntExists(res3, 1) || !mapIntIntExists(res3, 2) || !mapIntIntExists(res3, 3) {
+		t.Errorf("Match for 'all items' failed. Expected 0, 1, 2, 3\n")
+	}
+
+	if !mapIntIntExists(res4, 0) || res4[0] != 9 {
+		t.Errorf("Match for 'count first item' failed. Expected 9 matches for first item\n")
 	}
 }
