@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"testing"
 )
 
@@ -48,9 +49,40 @@ func TestStringToNgram(t *testing.T) {
 	}
 }
 
-func BenchmarkStringToNgram(b *testing.B) {
+func BenchmarkStringToDigram(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		StringToNgram("1234567890", 2)
+	}
+}
+
+func BenchmarkStringToTrigram(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		StringToNgram("1234567890", 3)
 	}
+}
+
+func BenchmarkStringToTrigram_long(b *testing.B) {
+	// Fetch 'main.go' file as a string
+	file := openFileAsString("main.go")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		// Ngram of an entire file 'main.go'
+		StringToNgram(file, 3)
+	}
+}
+
+func openFile(p string) []byte {
+	data, err := os.ReadFile(p)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+func openFileAsString(p string) string {
+	data := openFile(p)
+	return string(data)
 }
