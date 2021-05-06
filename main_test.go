@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"testing"
 )
@@ -260,5 +261,21 @@ func TestSortMatches(t *testing.T) {
 
 	if sorted[2][0] != 2 || sorted[2][1] != 4 {
 		t.Errorf("Sorting failed for 'count first and second item'. Expected thired item to have 4 matches\n")
+	}
+}
+
+func BenchmarkSortMatches(b *testing.B) {
+	ni := NewNgramIndex()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ni.Add(fmt.Sprint(i), 0) // change 0 -> i for a real bench (takes a while)
+	}
+
+	matches := ni.GetMatches("11223344444444555667778888899990")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ni.SortMatches(matches)
 	}
 }
