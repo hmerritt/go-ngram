@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"sort"
 )
 
 // Default ngram length
@@ -121,4 +122,26 @@ func (n *NgramIndex) GetMatches(str string) map[int]int {
 	}
 
 	return matches
+}
+
+/*
+ * Sort matched items from GetMatches()
+ * into a slice with 'best match' first
+ * decending into 'weakest' match last
+ *
+ * best match = most matches
+ */
+func (n *NgramIndex) SortMatches(matches map[int]int) [][]int {
+	// Create slice of index + weight
+	sortMatches := make([][]int, 0, len(matches))
+	for k := range matches {
+		sortMatches = append(sortMatches, []int{k, matches[k]})
+	}
+
+	// Sort slice
+	sort.Slice(sortMatches, func(i, j int) bool {
+		return sortMatches[i][1] > sortMatches[j][1]
+	})
+
+	return sortMatches
 }
