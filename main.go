@@ -8,6 +8,11 @@ import (
 // Default ngram length
 const ngramDefault = 3
 
+/*
+ * New Ngram index, Ngram length is decided here.
+ * Uses a reverse-index map (NgramMap) to store and
+ * search through items
+ */
 type NgramIndex struct {
 	// Index of ngrams
 	// string = ngram
@@ -23,8 +28,7 @@ type NgramIndex struct {
 }
 
 /*
- * Returns a new ngram index
- * using default values.
+ * Returns a new ngram index using default values.
  * Use NgramIndex{} for custom ngram lengths
  */
 func NewNgramIndex() *NgramIndex {
