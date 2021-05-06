@@ -1,6 +1,8 @@
 package main
 
-import "encoding/base64"
+import (
+	"encoding/base64"
+)
 
 // Default ngram length
 const ngramDefault = 3
@@ -34,13 +36,13 @@ func NewNgramIndex() *NgramIndex {
 
 /*
  * Ngram slice
- * splits a string into groups of 3,
- * used for indexing and fast searching
+ * splits a string into groups of N length,
+ * used for identifying indexed items and fast searching
  */
 func StringToNgram(s string, ngram int) []string {
 	trigrams := make([]string, 0)
 
-	if len(s) == 0 {
+	if len(s) < ngram {
 		return trigrams
 	}
 
