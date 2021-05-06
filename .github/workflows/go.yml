@@ -19,15 +19,15 @@ jobs:
         go-version: 1.16
 
     - name: Test
-      run: go test -v -covermode atomic -coverprofile covprofile ./...
+      run: go test --cover
 
     - name: Coverage
       env:
-        GO111MODULE: off
+        GO111MODULE: on
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         go get github.com/mattn/goveralls
-        goveralls -coverprofile covprofile -service github
+        goveralls -service github
 
     - name: Benchmark
       run: make bench
