@@ -153,3 +153,25 @@ func TestAdd(t *testing.T) {
 		t.Errorf("NgramMap index value not found. Expected 0, 1 and 2'\n")
 	}
 }
+
+func BenchmarkAdd(b *testing.B) {
+	ni := NewNgramIndex()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ni.Add("1234567890", i)
+	}
+}
+
+func BenchmarkAdd_long(b *testing.B) {
+	ni := NewNgramIndex()
+
+	// Fetch 'main.go' file as a string
+	file := openFileAsString("main.go")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		// Ngram of an entire file 'main.go'
+		ni.Add(file, i)
+	}
+}
