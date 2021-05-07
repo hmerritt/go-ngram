@@ -45,11 +45,11 @@ func NewNgramIndex() *NgramIndex {
  * used for identifying indexed items and fast searching
  */
 func StringToNgram(s string, ngram int) []string {
-	ngrams := make([]string, 0)
-
 	if len(s) < ngram {
-		return ngrams
+		return []string{}
 	}
+
+	ngrams := make([]string, 0, len(s))
 
 	for i := 0; i < len(s)-(ngram-1); i++ {
 		// Encode string to base 64,
