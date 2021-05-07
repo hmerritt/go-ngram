@@ -93,6 +93,17 @@ func (n *NgramIndex) Add(str string, index int) {
 }
 
 /*
+ * Search for all matches AND sorts
+ * the matches into 'best match'
+ *
+ * Alias of GetMatches + SortMatches
+ */
+func (n *NgramIndex) Search(str string) [][]int {
+	match := n.GetMatches(str)
+	return n.SortMatches(match)
+}
+
+/*
  * Search the NgramMap and return
  * an array of all the stored index values
  * that matched the input string
