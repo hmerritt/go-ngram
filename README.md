@@ -36,7 +36,13 @@ Search("rld") -> Hello, World
 | ------------- | ---------- | ------------------------------------------------------------------------------- |
 | `NewNgramIndex` | -           | Returns a new trigram index with the default settings                                       |
 | `Add`           | string, int | Add a string AND your own index value                                                       |
-| `Search`        | string      | Returns slice of all matched strings which contains your index value and the match strength | 
+| `Search`        | string      | Returns slice of all matched strings which contains your index value and the match strength, `[][index, weight]` | 
+|                 |             |                                                                                             | 
+| Helper functions |            |                                                                                             | 
+|                 |             |                                                                                             | 
+| `StringToNgram` | string, int | Returns an ngram of length N - Splits a string into groups of N length                      | 
+| `GetMatches`    | string      | Get all ngram matches, returns an unsorted map of indexes along with their match weight     | 
+| `SortMatches`   | `map[int]int` | Sorts output from `GetMatches` into a slice, first index [0] = best match                 | 
 
 ### General
 ```go
