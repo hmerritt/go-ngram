@@ -273,3 +273,34 @@ func BenchmarkSortMatches(b *testing.B) {
 		ni.SortMatches(matches)
 	}
 }
+
+func TestSearch(t *testing.T) {
+	// Create new index
+	ni := NewNgramIndex()
+
+	ni.Add("My first index item", 0)
+	ni.Add("Second item", 1)
+	ni.Add("Thired item too", 2)
+	ni.Add("Fourth item woowop", 3)
+
+	sorted := ni.Search("count first item")
+
+	// Fist item should be '[0, 9]'
+	if sorted[0][0] != 0 || sorted[0][1] != 9 {
+		t.Errorf("Search failed for 'count first item'. Expected first item to have 9 matches\n")
+	}
+
+	sorted = ni.Search("count first and second item")
+
+	if sorted[0][0] != 1 || sorted[0][1] != 9 {
+		t.Errorf("Search failed for 'count first item'. Expected first item to have 9 matches\n")
+	}
+
+	if sorted[1][0] != 0 || sorted[1][1] != 8 {
+		t.Errorf("Search failed for 'count first and second item'. Expected second item to have 8 matches\n")
+	}
+
+	if sorted[2][0] != 2 || sorted[2][1] != 4 {
+		t.Errorf("Search failed for 'count first and second item'. Expected thired item to have 4 matches\n")
+	}
+}
