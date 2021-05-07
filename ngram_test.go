@@ -113,12 +113,12 @@ func BenchmarkStringToTrigram(b *testing.B) {
 }
 
 func BenchmarkStringToTrigramLarge(b *testing.B) {
-	// Fetch 'main.go' file as a string
-	file := openFileAsString("main.go")
+	// Fetch 'ngram.go' file as a string
+	file := openFileAsString("ngram.go")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		// Ngram of an entire file 'main.go'
+		// Ngram of an entire file 'ngram.go'
 		StringToNgram(file, 3)
 	}
 }
@@ -168,12 +168,12 @@ func BenchmarkAdd(b *testing.B) {
 func BenchmarkAddLarge(b *testing.B) {
 	ni := NewNgramIndex()
 
-	// Fetch 'main.go' file as a string
-	file := openFileAsString("main.go")
+	// Fetch 'ngram.go' file as a string
+	file := openFileAsString("ngram.go")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		// Ngram of an entire file 'main.go'
+		// Ngram of an entire file 'ngram.go'
 		ni.Add(file, i)
 	}
 }
