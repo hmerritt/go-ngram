@@ -1,5 +1,5 @@
 # n-gram Index and Search
-[![Go](https://github.com/hmerritt/go-ngram/actions/workflows/go.yml/badge.svg)](https://github.com/hmerritt/go-ngram/actions/workflows/go.yml)  [![Coverage Status](https://coveralls.io/repos/github/hmerritt/go-ngram/badge.svg?branch=master)](https://coveralls.io/github/hmerritt/go-ngram?branch=master&kill_cache=1)
+[![Go Reference](https://pkg.go.dev/badge/github.com/hmerritt/go-ngram.svg)](https://pkg.go.dev/github.com/hmerritt/go-ngram)  [![Go](https://github.com/hmerritt/go-ngram/actions/workflows/go.yml/badge.svg)](https://github.com/hmerritt/go-ngram/actions/workflows/go.yml)  [![Coverage Status](https://coveralls.io/repos/github/hmerritt/go-ngram/badge.svg?branch=master)](https://coveralls.io/github/hmerritt/go-ngram?branch=master&kill_cache=1)
 
 Create n-grams, index items, and search through them.
 
