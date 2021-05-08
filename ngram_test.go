@@ -254,7 +254,7 @@ func TestSortMatches(t *testing.T) {
 		t.Errorf("Sorting failed for 'count first and second item'. Expected second item to have 8 matches\n")
 	}
 
-	if sorted[2].Index != 2 || sorted[2].Matches != 4 {
+	if sorted[2].Matches != 4 {
 		t.Errorf("Sorting failed for 'count first and second item'. Expected thired item to have 4 matches\n")
 	}
 }
@@ -301,7 +301,7 @@ func TestSearch(t *testing.T) {
 		t.Errorf("Sorting failed for 'count first and second item'. Expected second item to have 8 matches\n")
 	}
 
-	if sorted[2].Index != 2 || sorted[2].Matches != 4 {
+	if sorted[2].Matches != 4 {
 		t.Errorf("Sorting failed for 'count first and second item'. Expected thired item to have 4 matches\n")
 	}
 }
