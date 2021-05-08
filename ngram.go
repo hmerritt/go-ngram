@@ -36,13 +36,13 @@ type NgramIndex struct {
 	// Index of ngrams
 	// string = ngram
 	// map[int] = index value
-	NgramMap map[string]map[int]struct{}
+	NgramMap map[string]map[int]*IndexValue
 
 	// Map of ALL index values in NgramMap
-	IndexesMap map[int]struct{}
+	IndexesMap map[int]*IndexValue
 
 	// Length of n-grams to use
-	// (recommended number is '3', ngram)
+	// (recommended number is '3', trigram)
 	Ngram int
 }
 
@@ -50,11 +50,24 @@ type NgramIndex struct {
 //
 // Use NgramIndex{} for custom ngram lengths
 func NewNgramIndex() *NgramIndex {
-	t := new(NgramIndex)
-	t.NgramMap = make(map[string]map[int]struct{})
-	t.IndexesMap = make(map[int]struct{})
-	t.Ngram = ngramDefault
-	return t
+	t := NgramIndex{
+		NgramMap:   make(map[string]map[int]*IndexValue),
+		IndexesMap: make(map[int]*IndexValue),
+		Ngram:      DefaultNgramLength,
+	}
+	return &t
+}
+
+// Returns a new index value
+//
+// 'index' must be unique,
+// 'txt' can be anything you like
+func NewIndexValue(index int, txt string) *IndexValue {
+	iV := IndexValue{
+		Index: index,
+		Text:  txt,
+	}
+	return &iV
 }
 
 // Ngram slice
@@ -84,10 +97,10 @@ func StringToNgram(s string, ngram int) []string {
 // and the index value will be stored in each
 // ngram - this means the index value is accessible
 // through any part of the original string
-func (n *NgramIndex) Add(str string, index int) {
+func (n *NgramIndex) Add(str string, iV *IndexValue) {
 	// Add index to main map
 	// index *should* always be unique
-	n.IndexesMap[index] = struct{}{}
+	n.IndexesMap[iV.Index] = iV
 
 	// Get ngram slice from input string
 	ngram := StringToNgram(str, n.Ngram)
@@ -97,12 +110,12 @@ func (n *NgramIndex) Add(str string, index int) {
 		// Check if ng does NOT exist
 		if _, exist := n.NgramMap[ng]; !exist {
 			// Create ng
-			newNg := make(map[int]struct{})
+			newNg := make(map[int]*IndexValue)
 			n.NgramMap[ng] = newNg
 		}
 
 		// Add index value to ng
-		n.NgramMap[ng][index] = struct{}{}
+		n.NgramMap[ng][iV.Index] = iV
 	}
 }
 
@@ -110,7 +123,7 @@ func (n *NgramIndex) Add(str string, index int) {
 // the matches into 'best match'
 //
 // Alias of GetMatches + SortMatches
-func (n *NgramIndex) Search(str string) [][]int {
+func (n *NgramIndex) Search(str string) []*IndexValue {
 	match := n.GetMatches(str)
 	return n.SortMatches(match)
 }
@@ -118,11 +131,11 @@ func (n *NgramIndex) Search(str string) [][]int {
 // Search the NgramMap and return
 // an array of all the stored index values
 // that matched the input string
-func (n *NgramIndex) GetMatches(str string) map[int]int {
+func (n *NgramIndex) GetMatches(str string) map[int]*IndexValue {
 	// Create map of indexes plus how often
 	// each one matched. This is used to detirmine
 	// an indexes 'weight'.
-	matches := make(map[int]int)
+	matches := make(map[int]*IndexValue)
 
 	// Get ngram slice
 	ngram := StringToNgram(str, n.Ngram)
@@ -137,11 +150,11 @@ func (n *NgramIndex) GetMatches(str string) map[int]int {
 			for index := range n.NgramMap[tg] {
 				// Has index been added already,
 				// increment match weight
-				if _, exist := matches[index]; exist {
-					matches[index] = matches[index] + 1
-				} else {
-					matches[index] = 1
+				if _, exist := matches[index]; !exist {
+					matches[index] = n.NgramMap[tg][index]
 				}
+
+				matches[index].Matches++
 			}
 		}
 	}
@@ -154,16 +167,16 @@ func (n *NgramIndex) GetMatches(str string) map[int]int {
 // decending into 'weakest' match last
 //
 // best match = most matches
-func (n *NgramIndex) SortMatches(matches map[int]int) [][]int {
-	// Create slice of index + weight
-	sortMatches := make([][]int, 0, len(matches))
+func (n *NgramIndex) SortMatches(matches map[int]*IndexValue) []*IndexValue {
+	// Create slice of index values
+	sortMatches := make([]*IndexValue, 0, len(matches))
 	for k := range matches {
-		sortMatches = append(sortMatches, []int{k, matches[k]})
+		sortMatches = append(sortMatches, matches[k])
 	}
 
 	// Sort slice
 	sort.Slice(sortMatches, func(i, j int) bool {
-		return sortMatches[i][1] > sortMatches[j][1]
+		return sortMatches[i].Matches > sortMatches[j].Matches
 	})
 
 	return sortMatches
