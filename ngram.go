@@ -5,8 +5,28 @@ import (
 	"sort"
 )
 
-// Default ngram length
-const ngramDefault = 3
+// Trigram
+// Used for NewNgramIndex()
+const DefaultNgramLength = 3
+
+// Index value, the value which an ngram points to.
+//
+// Gets returned when using Search() or GetMatches().
+//
+// Do NOT modify 'Matches' -> this value is set automatically
+// when searching and will only mess things up!
+type IndexValue struct {
+	Index   int
+	Matches int
+	Text    string
+
+	// Debating to include the following types,
+	// as far as i'm aware, there is no downsides.
+	// SliceInt        []int
+	// SliceString     []string
+	// MapStringInt    map[string]int
+	// MapStringString map[string]string
+}
 
 // Ngram index, uses a reverse-index map (NgramMap)
 // to store and search through items.
