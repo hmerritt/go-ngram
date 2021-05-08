@@ -133,8 +133,8 @@ func TestAdd(t *testing.T) {
 	ni.Add("Thired item too", NewIndexValue(2, "third"))
 
 	// Check the index got added
-	if ni.IndexesMap[0].Index != 0 || ni.IndexesMap[0].Text != "first" ||
-		ni.IndexesMap[1].Index != 1 || ni.IndexesMap[1].Text != "second" {
+	if ni.IndexesMap[0].Index != 0 || ni.IndexesMap[0].Data != "first" ||
+		ni.IndexesMap[1].Index != 1 || ni.IndexesMap[1].Data != "second" {
 		t.Errorf("IndexMap does not match items added'\n")
 	}
 
@@ -239,7 +239,7 @@ func TestSortMatches(t *testing.T) {
 	sorted := ni.SortMatches(res)
 
 	// Fist item should be '[0, 9, "first"]'
-	if sorted[0].Index != 0 || sorted[0].Matches != 9 || sorted[0].Text != "first" {
+	if sorted[0].Index != 0 || sorted[0].Matches != 9 || sorted[0].Data != "first" {
 		t.Errorf("Sorting failed for 'count first item'. Expected first item to have 9 matches\n")
 	}
 
@@ -287,7 +287,7 @@ func TestSearch(t *testing.T) {
 	sorted := ni.Search("count first item")
 
 	// Fist item should be '[0, 9, "first"]'
-	if sorted[0].Index != 0 || sorted[0].Matches != 9 || sorted[0].Text != "first" {
+	if sorted[0].Index != 0 || sorted[0].Matches != 9 || sorted[0].Data != "first" {
 		t.Errorf("Sorting failed for 'count first item'. Expected first item to have 9 matches\n")
 	}
 
