@@ -18,7 +18,7 @@ const DefaultNgramLength = 3
 type IndexValue struct {
 	Index   int
 	Matches int
-	Text    string
+	Data    string
 
 	// Debating including the following types,
 	// as far as i'm aware, there are no downsides.
@@ -65,7 +65,7 @@ func NewNgramIndex() *NgramIndex {
 func NewIndexValue(index int, txt string) *IndexValue {
 	iV := IndexValue{
 		Index: index,
-		Text:  txt,
+		Data:  txt,
 	}
 	return &iV
 }
@@ -156,7 +156,7 @@ func (n *NgramIndex) GetMatches(str string) map[int]*IndexValue {
 					// messing with 'matches' value
 					matches[index] = &IndexValue{
 						Index: index,
-						Text:  n.NgramMap[tg][index].Text,
+						Data:  n.NgramMap[tg][index].Data,
 					}
 				}
 
