@@ -8,11 +8,10 @@ import (
 // Default ngram length
 const ngramDefault = 3
 
-/*
- * New Ngram index, Ngram length is decided here.
- * Uses a reverse-index map (NgramMap) to store and
- * search through items
- */
+// Ngram index, uses a reverse-index map (NgramMap)
+// to store and search through items.
+//
+// Ngram length is decided here.
 type NgramIndex struct {
 	// Index of ngrams
 	// string = ngram
@@ -27,10 +26,9 @@ type NgramIndex struct {
 	Ngram int
 }
 
-/*
- * Returns a new ngram index using default values.
- * Use NgramIndex{} for custom ngram lengths
- */
+// Returns a new ngram index using default values.
+//
+// Use NgramIndex{} for custom ngram lengths
 func NewNgramIndex() *NgramIndex {
 	t := new(NgramIndex)
 	t.NgramMap = make(map[string]map[int]struct{})
@@ -39,11 +37,9 @@ func NewNgramIndex() *NgramIndex {
 	return t
 }
 
-/*
- * Ngram slice
- * splits a string into groups of N length,
- * used for identifying indexed items and fast searching
- */
+// Ngram slice
+// splits a string into groups of N length,
+// used for adding items to the index and fast searching
 func StringToNgram(s string, ngram int) []string {
 	if len(s) < ngram {
 		return []string{}
@@ -62,14 +58,12 @@ func StringToNgram(s string, ngram int) []string {
 	return ngrams
 }
 
-/*
- * Add a string and an index value to the store
- *
- * string will be indexed as an ngram
- * and the index value will be stored in each
- * ngram - this means the index value is accessible
- * through any part of the original string
- */
+// Add a string and an index value to the store
+//
+// string will be indexed as an ngram
+// and the index value will be stored in each
+// ngram - this means the index value is accessible
+// through any part of the original string
 func (n *NgramIndex) Add(str string, index int) {
 	// Add index to main map
 	// index *should* always be unique
@@ -92,22 +86,18 @@ func (n *NgramIndex) Add(str string, index int) {
 	}
 }
 
-/*
- * Search for all matches AND sorts
- * the matches into 'best match'
- *
- * Alias of GetMatches + SortMatches
- */
+// Search for all matches AND sorts
+// the matches into 'best match'
+//
+// Alias of GetMatches + SortMatches
 func (n *NgramIndex) Search(str string) [][]int {
 	match := n.GetMatches(str)
 	return n.SortMatches(match)
 }
 
-/*
- * Search the NgramMap and return
- * an array of all the stored index values
- * that matched the input string
- */
+// Search the NgramMap and return
+// an array of all the stored index values
+// that matched the input string
 func (n *NgramIndex) GetMatches(str string) map[int]int {
 	// Create map of indexes plus how often
 	// each one matched. This is used to detirmine
@@ -139,13 +129,11 @@ func (n *NgramIndex) GetMatches(str string) map[int]int {
 	return matches
 }
 
-/*
- * Sort matched items from GetMatches()
- * into a slice with 'best match' first
- * decending into 'weakest' match last
- *
- * best match = most matches
- */
+// Sort matched items from GetMatches()
+// into a slice with 'best match' first
+// decending into 'weakest' match last
+//
+// best match = most matches
 func (n *NgramIndex) SortMatches(matches map[int]int) [][]int {
 	// Create slice of index + weight
 	sortMatches := make([][]int, 0, len(matches))
