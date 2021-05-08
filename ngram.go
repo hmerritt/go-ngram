@@ -18,7 +18,7 @@ const DefaultNgramLength = 3
 type IndexValue struct {
 	Index   int
 	Matches int
-	Data    string
+	Data    interface{}
 
 	// Debating including the following types,
 	// as far as i'm aware, there are no downsides.
@@ -60,12 +60,14 @@ func NewNgramIndex() *NgramIndex {
 
 // Returns a new index value
 //
+// This is what gets returned when using Search() or GetMatches().
+//
 // 'index' must be unique,
-// 'txt' can be anything you like
-func NewIndexValue(index int, txt string) *IndexValue {
+// 'data' can be anything you like
+func NewIndexValue(index int, data interface{}) *IndexValue {
 	iV := IndexValue{
 		Index: index,
-		Data:  txt,
+		Data:  data,
 	}
 	return &iV
 }
