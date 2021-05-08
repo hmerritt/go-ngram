@@ -36,10 +36,10 @@ type NgramIndex struct {
 	// Index of ngrams
 	// string = ngram
 	// map[int] = index value
-	NgramMap map[string]map[int]*IndexValue
+	NgramMap map[string]map[int]IndexValue
 
 	// Map of ALL index values in NgramMap
-	IndexesMap map[int]*IndexValue
+	IndexesMap map[int]IndexValue
 
 	// Length of n-grams to use
 	// (recommended number is '3', trigram)
@@ -51,8 +51,8 @@ type NgramIndex struct {
 // Use NgramIndex{} for custom ngram lengths
 func NewNgramIndex() *NgramIndex {
 	t := NgramIndex{
-		NgramMap:   make(map[string]map[int]*IndexValue),
-		IndexesMap: make(map[int]*IndexValue),
+		NgramMap:   make(map[string]map[int]IndexValue),
+		IndexesMap: make(map[int]IndexValue),
 		Ngram:      DefaultNgramLength,
 	}
 	return &t
@@ -62,12 +62,12 @@ func NewNgramIndex() *NgramIndex {
 //
 // 'index' must be unique,
 // 'txt' can be anything you like
-func NewIndexValue(index int, txt string) *IndexValue {
+func NewIndexValue(index int, txt string) IndexValue {
 	iV := IndexValue{
 		Index: index,
 		Text:  txt,
 	}
-	return &iV
+	return iV
 }
 
 // Ngram slice
@@ -97,7 +97,7 @@ func StringToNgram(s string, ngram int) []string {
 // and the index value will be stored in each
 // ngram - this means the index value is accessible
 // through any part of the original string
-func (n *NgramIndex) Add(str string, iV *IndexValue) {
+func (n *NgramIndex) Add(str string, iV IndexValue) {
 	// Add index to main map
 	// index *should* always be unique
 	n.IndexesMap[iV.Index] = iV
@@ -110,7 +110,7 @@ func (n *NgramIndex) Add(str string, iV *IndexValue) {
 		// Check if ng does NOT exist
 		if _, exist := n.NgramMap[ng]; !exist {
 			// Create ng
-			newNg := make(map[int]*IndexValue)
+			newNg := make(map[int]IndexValue)
 			n.NgramMap[ng] = newNg
 		}
 
