@@ -23,7 +23,7 @@ func openFileAsString(p string) string {
 	return string(data)
 }
 
-func mapIntIntExists(m map[int]int, i int) bool {
+func mapIntIndexValueExists(m map[int]*IndexValue, i int) bool {
 	if _, ok := m[i]; ok {
 		return true
 	}
@@ -128,12 +128,13 @@ func TestAdd(t *testing.T) {
 	ni := NewNgramIndex()
 
 	// Add a few items
-	ni.Add("My first index item", 0)
-	ni.Add("Second item", 1)
-	ni.Add("Thired item too", 2)
+	ni.Add("My first index item", NewIndexValue(0, "first"))
+	ni.Add("Second item", NewIndexValue(1, "second"))
+	ni.Add("Thired item too", NewIndexValue(2, "third"))
 
 	// Check the index got added
-	if ni.IndexesMap[0] != struct{}{} || ni.IndexesMap[1] != struct{}{} || ni.IndexesMap[2] != struct{}{} {
+	if ni.IndexesMap[0].Index != 0 || ni.IndexesMap[0].Text != "first" ||
+		ni.IndexesMap[1].Index != 1 || ni.IndexesMap[1].Text != "second" {
 		t.Errorf("IndexMap does not match items added'\n")
 	}
 
@@ -161,7 +162,7 @@ func BenchmarkAdd(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ni.Add("1234567890", i)
+		ni.Add("1234567890", NewIndexValue(i, ""))
 	}
 }
 
@@ -174,7 +175,7 @@ func BenchmarkAddLarge(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		// Ngram of an entire file 'ngram.go'
-		ni.Add(file, i)
+		ni.Add(file, NewIndexValue(i, "ngram.go"))
 	}
 }
 
@@ -183,10 +184,10 @@ func TestGetMatches(t *testing.T) {
 	ni := NewNgramIndex()
 
 	// Add a few items
-	ni.Add("My first index item", 0)
-	ni.Add("Second item", 1)
-	ni.Add("Thired item too", 2)
-	ni.Add("Fourth item woowop", 3)
+	ni.Add("My first index item", NewIndexValue(0, "first"))
+	ni.Add("Second item", NewIndexValue(1, "second"))
+	ni.Add("Thired item too", NewIndexValue(2, "third"))
+	ni.Add("Thired item too", NewIndexValue(3, "fourth"))
 
 	// Get search results
 	res1 := ni.GetMatches("first")
@@ -194,19 +195,19 @@ func TestGetMatches(t *testing.T) {
 	res3 := ni.GetMatches("all items")
 	res4 := ni.GetMatches("count first item")
 
-	if !mapIntIntExists(res1, 0) || res1[0] != 3 { // 'first' matches 3 times when using a trigram
+	if !mapIntIndexValueExists(res1, 0) || res1[0].Matches != 3 { // 'first' matches 3 times when using a trigram
 		t.Errorf("Match count for 'first' is wrong. Expected 3'\n")
 	}
 
-	if !mapIntIntExists(res2, 1) || res2[1] != 4 { // 'Second' matches 4 times when using a trigram
+	if !mapIntIndexValueExists(res2, 1) || res2[1].Matches != 4 { // 'Second' matches 4 times when using a trigram
 		t.Errorf("Match count for 'Second' is wrong. Expected 4'\n")
 	}
 
-	if !mapIntIntExists(res3, 0) || !mapIntIntExists(res3, 1) || !mapIntIntExists(res3, 2) || !mapIntIntExists(res3, 3) {
+	if !mapIntIndexValueExists(res3, 0) || !mapIntIndexValueExists(res3, 1) || !mapIntIndexValueExists(res3, 2) || !mapIntIndexValueExists(res3, 3) {
 		t.Errorf("Match for 'all items' failed. Expected 0, 1, 2, 3\n")
 	}
 
-	if !mapIntIntExists(res4, 0) || res4[0] != 9 {
+	if !mapIntIndexValueExists(res4, 0) || res4[0].Matches != 9 {
 		t.Errorf("Match for 'count first item' failed. Expected 9 matches for first item\n")
 	}
 }
@@ -216,7 +217,7 @@ func BenchmarkGetMatches(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ni.Add("1234567890", 0) // change 0 -> i for a real bench (takes a while)
+		ni.Add("1234567890", NewIndexValue(0, "")) // change 0 -> i for a real bench (takes a while)
 	}
 
 	b.ResetTimer()
@@ -229,31 +230,31 @@ func TestSortMatches(t *testing.T) {
 	// Create new index
 	ni := NewNgramIndex()
 
-	ni.Add("My first index item", 0)
-	ni.Add("Second item", 1)
-	ni.Add("Thired item too", 2)
-	ni.Add("Fourth item woowop", 3)
+	ni.Add("My first index item", NewIndexValue(0, "first"))
+	ni.Add("Second item", NewIndexValue(1, "second"))
+	ni.Add("Thired item too", NewIndexValue(2, "third"))
+	ni.Add("Thired item too", NewIndexValue(3, "fourth"))
 
 	res := ni.GetMatches("count first item")
 	sorted := ni.SortMatches(res)
 
-	// Fist item should be '[0, 9]'
-	if sorted[0][0] != 0 || sorted[0][1] != 9 {
+	// Fist item should be '[0, 9, "first"]'
+	if sorted[0].Index != 0 || sorted[0].Matches != 9 || sorted[0].Text != "first" {
 		t.Errorf("Sorting failed for 'count first item'. Expected first item to have 9 matches\n")
 	}
 
 	res = ni.GetMatches("count first and second item")
 	sorted = ni.SortMatches(res)
 
-	if sorted[0][0] != 1 || sorted[0][1] != 9 {
+	if sorted[0].Index != 1 || sorted[0].Matches != 9 {
 		t.Errorf("Sorting failed for 'count first item'. Expected first item to have 9 matches\n")
 	}
 
-	if sorted[1][0] != 0 || sorted[1][1] != 8 {
+	if sorted[1].Index != 0 || sorted[1].Matches != 8 {
 		t.Errorf("Sorting failed for 'count first and second item'. Expected second item to have 8 matches\n")
 	}
 
-	if sorted[2][0] != 2 || sorted[2][1] != 4 {
+	if sorted[2].Index != 2 || sorted[2].Matches != 4 {
 		t.Errorf("Sorting failed for 'count first and second item'. Expected thired item to have 4 matches\n")
 	}
 }
@@ -263,7 +264,7 @@ func BenchmarkSortMatches(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ni.Add(fmt.Sprint(i), 0) // change 0 -> i for a real bench (takes a while)
+		ni.Add(fmt.Sprint(i), NewIndexValue(0, "")) // change 0 -> i for a real bench (takes a while)
 	}
 
 	matches := ni.GetMatches("11223344444444555667778888899990")
@@ -278,29 +279,29 @@ func TestSearch(t *testing.T) {
 	// Create new index
 	ni := NewNgramIndex()
 
-	ni.Add("My first index item", 0)
-	ni.Add("Second item", 1)
-	ni.Add("Thired item too", 2)
-	ni.Add("Fourth item woowop", 3)
+	ni.Add("My first index item", NewIndexValue(0, "first"))
+	ni.Add("Second item", NewIndexValue(1, "second"))
+	ni.Add("Thired item too", NewIndexValue(2, "third"))
+	ni.Add("Thired item too", NewIndexValue(3, "fourth"))
 
 	sorted := ni.Search("count first item")
 
-	// Fist item should be '[0, 9]'
-	if sorted[0][0] != 0 || sorted[0][1] != 9 {
-		t.Errorf("Search failed for 'count first item'. Expected first item to have 9 matches\n")
+	// Fist item should be '[0, 9, "first"]'
+	if sorted[0].Index != 0 || sorted[0].Matches != 9 || sorted[0].Text != "first" {
+		t.Errorf("Sorting failed for 'count first item'. Expected first item to have 9 matches\n")
 	}
 
 	sorted = ni.Search("count first and second item")
 
-	if sorted[0][0] != 1 || sorted[0][1] != 9 {
-		t.Errorf("Search failed for 'count first item'. Expected first item to have 9 matches\n")
+	if sorted[0].Index != 1 || sorted[0].Matches != 9 {
+		t.Errorf("Sorting failed for 'count first item'. Expected first item to have 9 matches\n")
 	}
 
-	if sorted[1][0] != 0 || sorted[1][1] != 8 {
-		t.Errorf("Search failed for 'count first and second item'. Expected second item to have 8 matches\n")
+	if sorted[1].Index != 0 || sorted[1].Matches != 8 {
+		t.Errorf("Sorting failed for 'count first and second item'. Expected second item to have 8 matches\n")
 	}
 
-	if sorted[2][0] != 2 || sorted[2][1] != 4 {
-		t.Errorf("Search failed for 'count first and second item'. Expected thired item to have 4 matches\n")
+	if sorted[2].Index != 2 || sorted[2].Matches != 4 {
+		t.Errorf("Sorting failed for 'count first and second item'. Expected thired item to have 4 matches\n")
 	}
 }
