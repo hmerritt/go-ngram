@@ -130,11 +130,11 @@ func TestAdd(t *testing.T) {
 	// Add a few items
 	ni.Add("My first index item", NewIndexValue(0, "first"))
 	ni.Add("Second item", NewIndexValue(1, "second"))
-	ni.Add("Thired item too", NewIndexValue(2, "third"))
+	ni.Add("Thired item too", NewIndexValue(2, 8008))
 
 	// Check the index got added
 	if ni.IndexesMap[0].Index != 0 || ni.IndexesMap[0].Data != "first" ||
-		ni.IndexesMap[1].Index != 1 || ni.IndexesMap[1].Data != "second" {
+		ni.IndexesMap[2].Index != 2 || ni.IndexesMap[2].Data != 8008 {
 		t.Errorf("IndexMap does not match items added'\n")
 	}
 
