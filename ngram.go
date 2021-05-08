@@ -20,8 +20,8 @@ type IndexValue struct {
 	Matches int
 	Text    string
 
-	// Debating to include the following types,
-	// as far as i'm aware, there is no downsides.
+	// Debating including the following types,
+	// as far as i'm aware, there are no downsides.
 	// SliceInt        []int
 	// SliceString     []string
 	// MapStringInt    map[string]int
@@ -123,7 +123,7 @@ func (n *NgramIndex) Add(str string, iV *IndexValue) {
 // the matches into 'best match'
 //
 // Alias of GetMatches + SortMatches
-func (n *NgramIndex) Search(str string) []*IndexValue {
+func (n *NgramIndex) Search(str string) []IndexValue {
 	match := n.GetMatches(str)
 	return n.SortMatches(match)
 }
@@ -151,7 +151,13 @@ func (n *NgramIndex) GetMatches(str string) map[int]*IndexValue {
 				// Has index been added already,
 				// increment match weight
 				if _, exist := matches[index]; !exist {
-					matches[index] = n.NgramMap[tg][index]
+					// Create a NEW inctance of the index value
+					// This is to stop previous/future searches
+					// messing with 'matches' value
+					matches[index] = &IndexValue{
+						Index: index,
+						Text:  n.NgramMap[tg][index].Text,
+					}
 				}
 
 				matches[index].Matches++
@@ -167,11 +173,11 @@ func (n *NgramIndex) GetMatches(str string) map[int]*IndexValue {
 // decending into 'weakest' match last
 //
 // best match = most matches
-func (n *NgramIndex) SortMatches(matches map[int]*IndexValue) []*IndexValue {
+func (n *NgramIndex) SortMatches(matches map[int]*IndexValue) []IndexValue {
 	// Create slice of index values
-	sortMatches := make([]*IndexValue, 0, len(matches))
+	sortMatches := make([]IndexValue, 0, len(matches))
 	for k := range matches {
-		sortMatches = append(sortMatches, matches[k])
+		sortMatches = append(sortMatches, *matches[k])
 	}
 
 	// Sort slice
